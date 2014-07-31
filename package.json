@@ -1,0 +1,52 @@
+{
+  "name": "bionode-bwa",
+  "description": "A Node.js wrapper for the Burrow-Wheeler Aligner (BWA).",
+  "version": "0.0.1",
+  "homepage": "http://github.com/bionode/bionode-bwa",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bmpvieira/bionode-bwa.git"
+  },
+  "author": {
+    "name": "Bruno Vieira",
+    "email": "mail@bmpvieira.com"
+  },
+  "dependencies": {
+    "through2": "~0.4.1",
+    "split": "~0.3.0",
+    "debug": "~1.0.4",
+    "minimist": "~0.2.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.17.0",
+    "mocha-lcov-reporter": "0.0.1",
+    "should": "~3.0.1",
+    "istanbul": "~0.2.4",
+    "coveralls": "~2.6.1",
+    "async": "~0.9.0",
+    "request": "~2.37.0",
+    "tool-stream": "0.0.1",
+    "through2": "~0.4.2",
+    "docco": "~0.6.3"
+  },
+  "keywords": [
+    "bioinformatics",
+    "aligner",
+    "wrapper",
+    "installer",
+    "streams",
+    "cli"
+  ],
+  "main": "index.js",
+  "bin": {
+    "bionode-bwa": "cli.js"
+  },
+  "scripts": {
+    "preinstall": "git clone https://github.com/lh3/bwa.git; cd bwa; git checkout 0.7.10; make",
+    "test": "mocha --reporter spec; rm test/reference.*; rm test/reads.*; rm test/alignment.sam",
+    "build-docs": "docco ./lib/bionode-bwa.js",
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam",
+    "coveralls": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam"
+  },
+  "license": "MIT"
+}
