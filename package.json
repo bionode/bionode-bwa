@@ -48,8 +48,8 @@
     "preinstall": "git clone https://github.com/lh3/bwa.git; cd bwa; git checkout 0.7.10; make",
     "test": "node test/bionode-bwa.js | tap-spec && rm test/reference.* && rm test/reads.* && rm test/alignment.sam",
     "build-docs": "docco ./lib/bionode-bwa.js",
-    "coverage": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam",
-    "coveralls": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam"
+    "coverage": "istanbul cover test/bionode-bwa.js --report lcovonly -- | tap-spec && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam",
+    "coveralls": "istanbul cover test/bionode-bwa.js --report lcovonly -- | tap-spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam"
   },
   "license": "MIT"
 }
