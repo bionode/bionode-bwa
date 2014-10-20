@@ -1,7 +1,7 @@
 {
   "name": "bionode-bwa",
   "description": "A Node.js wrapper for the Burrow-Wheeler Aligner (BWA).",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "homepage": "http://github.com/bionode/bionode-bwa",
   "repository": {
     "type": "git",
