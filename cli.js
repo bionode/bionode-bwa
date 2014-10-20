@@ -13,6 +13,26 @@ Object.keys(argv).forEach(function(key) {
 })
 
 var operation = bwa(operationArgs)
-operation(filenames)
-.on('data', console.log)
-.on('error', console.log)
+
+if (!process.stdin.isTTY) {
+  process.stdin.on('data', function(data) {
+    var data = data.trim().replace(/['"]/g, '')
+    if (data === '') { return }
+    filenames.push(data)
+    operation(filenames).pipe(JSONstringify()).pipe(process.stdout)
+  })
+}
+else {
+  operation(filenames).pipe(JSONstringify()).pipe(process.stdout)
+}
+
+function JSONstringify() {
+  var stream = through.obj(transform)
+  return stream
+  function transform(obj, enc, next) {
+    var data = JSON.stringify(obj).trim()
+    if (data === '') { return next() }
+    this.push(data + '\n')
+    next()
+  }
+}
