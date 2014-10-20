@@ -15,6 +15,7 @@ Object.keys(argv).forEach(function(key) {
 var operation = bwa(operationArgs)
 
 if (!process.stdin.isTTY) {
+  process.stdin.setEncoding('utf8')
   process.stdin.on('data', function(data) {
     var data = data.trim().replace(/['"]/g, '')
     if (data === '') { return }
