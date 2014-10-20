@@ -5,7 +5,7 @@
   "homepage": "http://github.com/bionode/bionode-bwa",
   "repository": {
     "type": "git",
-    "url": "git://github.com/bmpvieira/bionode-bwa.git"
+    "url": "git://github.com/bionode/bionode-bwa.git"
   },
   "author": {
     "name": "Bruno Vieira",
