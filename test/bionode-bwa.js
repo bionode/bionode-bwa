@@ -19,7 +19,7 @@ test("Align reads to reference with BWA", function (t) {
     download(referenceURL, referencePath),
     download(readsURL, readsPath)
   ]
-  async.parallel(downloads, alignReadsToRef)
+  async.series(downloads, alignReadsToRef)
 
   function alignReadsToRef() {
     var msg = "should take paths for reference, reads and aligment. Reference should be indexed first."
@@ -40,10 +40,12 @@ function download(url, path) {
   return function task(callback) {
     var read = request(url)
     var write = fs.createWriteStream(path)
-    read
-    .pipe(write)
+    read.pipe(write)
+    write
     .on('finish', callback)
-    .on('error', callback)
+    .on('error', function (error) {
+      console.warn(error)
+    })
   }
 }
 
