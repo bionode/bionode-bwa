@@ -15,24 +15,33 @@ test("Align reads to reference with BWA", function (t) {
   var referenceURL = 'http://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/protozoa/Guillardia_theta/Guith1/Primary_Assembly/unplaced_scaffolds/FASTA/unplaced.scaf.fa.gz'
   var readsURL = 'http://ftp.sra.ebi.ac.uk//vol1/fastq/SRR070/SRR070675/SRR070675.fastq.gz'
 
-  var downloads = [
+  var asyncFuncs = [
     download(referenceURL, referencePath),
-    download(readsURL, readsPath)
+    download(readsURL, readsPath),
+    alignReadsToRef1,
+    alignReadsToRef2
   ]
-  async.series(downloads, alignReadsToRef)
+  async.series(asyncFuncs)
 
-  function alignReadsToRef() {
+  function alignReadsToRef1(cb) {
     var msg = "should take paths for reference, reads and aligment. Reference should be indexed first."
     var mem = bwa() // default to mem
     mem([referencePath, readsPath, alignmentPath])
-    .on('data', function(data) { checksum(data, '3dae171586e8f5fda2737795ff2e39df711701cb', msg, t) })
-
+    .on('data', function(data) {
+      checksum(data, '3dae171586e8f5fda2737795ff2e39df711701cb', msg, t)
+      cb()
+    })
+  }
+  function alignReadsToRef2(cb) {
     var msg = "should align using a Stream that takes arrays of paths for reference and reads."
     var mem = bwa('mem -x pacbio')
     var memStream = mem() // we will pass arguments with write
     memStream.write([referencePath, readsPath])
     memStream.end()
-    memStream.on('data', function(data) { checksum(data, 'a2ac465ac0d9e0879a9f9a43108e36b682f2e018', msg, t) })
+    memStream.on('data', function(data) {
+      checksum(data, 'a2ac465ac0d9e0879a9f9a43108e36b682f2e018', msg, t)
+      cb()
+    })
   }
 })
 
