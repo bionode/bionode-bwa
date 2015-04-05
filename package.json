@@ -12,22 +12,26 @@
     "email": "mail@bmpvieira.com"
   },
   "dependencies": {
-    "debug": "^2.1.0",
-    "minimist": "~0.2.0",
-    "split": "~0.3.0",
-    "through2": "~0.4.1"
+    "concat-stream": "^1.4.8",
+    "debug": "^2.1.3",
+    "dependency-check": "^2.3.1",
+    "ndjson": "^1.3.0",
+    "pumpify": "^1.3.3",
+    "split": "^0.3.3",
+    "standard": "^3.3.2",
+    "through2": "^0.6.3",
+    "yargs": "^3.7.0"
   },
   "devDependencies": {
     "async": "~0.9.0",
-    "coveralls": "~2.11.1",
-    "docco": "~0.6.3",
-    "istanbul": "~0.3.0",
-    "request": "~2.39.0",
-    "tap-spec": "^1.0.0",
-    "tape": "^3.0.0",
+    "coveralls": "~2.11.2",
+    "docco": "~0.7.0",
+    "istanbul": "~0.3.13",
+    "request": "~2.55.0",
+    "tap-spec": "^3.0.0",
+    "tape": "^4.0.0",
     "testling": "^1.7.1",
-    "through2": "~0.5.1",
-    "tool-stream": "0.0.1"
+    "tool-stream": "0.2.1"
   },
   "keywords": [
     "bio",
@@ -45,11 +49,16 @@
     "bionode-bwa": "cli.js"
   },
   "scripts": {
-    "preinstall": "git clone https://github.com/lh3/bwa.git; cd bwa; git checkout 0.7.10; make",
-    "test": "node test/bionode-bwa.js | tap-spec && rm test/reference.* && rm test/reads.* && rm test/alignment.sam",
+    "preinstall": "git clone https://github.com/lh3/bwa.git; cd bwa; git checkout 0.7.12; make",
+    "test": "standard && dependency-check . && node test/bionode-bwa.js | tap-spec && rm test/reference.* && rm test/reads.* && rm test/alignment.sam",
     "build-docs": "docco ./lib/bionode-bwa.js",
-    "coverage": "istanbul cover test/bionode-bwa.js --report lcovonly -- | tap-spec && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam",
+    "coverage": "standard && dependency-check . && istanbul cover test/bionode-bwa.js --report lcovonly -- | tap-spec && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam",
     "coveralls": "istanbul cover test/bionode-bwa.js --report lcovonly -- | tap-spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage; rm test/reference.*; rm test/reads.*; rm test/alignment.sam"
+  },
+  "standard": {
+    "ignore": [
+      "bwa/**"
+    ]
   },
   "license": "MIT"
 }

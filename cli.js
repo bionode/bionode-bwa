@@ -1,39 +1,22 @@
 #!/usr/bin/env node
 var bwa = require('./')
-var through = require('through2')
-var minimist = require('minimist')
+var yargs = require('yargs')
+var json = require('ndjson')
 
-var argv = minimist(process.argv.slice(2))
-var filenames = argv._.slice(1)
-var operationArgs = argv._[0]
-Object.keys(argv).forEach(function(key) {
-  if (key !== '_') {
-    operationArgs += ' -' + key + ' ' + argv[key]
-  }
-})
-
-var operation = bwa(operationArgs)
-
-if (!process.stdin.isTTY) {
-  process.stdin.setEncoding('utf8')
-  process.stdin.on('data', function(data) {
-    var data = data.trim().replace(/['"]/g, '')
-    if (data === '') { return }
-    filenames.push(data)
-    operation(filenames).pipe(JSONstringify()).pipe(process.stdout)
-  })
-}
-else {
-  operation(filenames).pipe(JSONstringify()).pipe(process.stdout)
+var argv = yargs.argv
+var options = {
+  reference: argv._.length > 1 ? argv._[0] : null,
+  reads: argv._.length > 1 ? argv._.slice(1) : null,
+  alignment: argv.alignment,
+  operation: argv.operation
 }
 
-function JSONstringify() {
-  var stream = through.obj(transform)
-  return stream
-  function transform(obj, enc, next) {
-    var data = JSON.stringify(obj).trim()
-    if (data === '') { return next() }
-    this.push(data + '\n')
-    next()
-  }
+var stream = bwa(options)
+stream.pipe(json.stringify()).pipe(process.stdout)
+stream.on('error', console.warn)
+
+if (argv._[argv._.length - 1] === '-') {
+  process.stdin
+  .pipe(json.parse())
+  .pipe(stream)
 }

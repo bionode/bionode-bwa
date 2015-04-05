@@ -1,13 +1,10 @@
 var bwa = require('../')
 var fs = require('fs')
-var crypto = require('crypto')
 var request = require('request')
-var tool = require('tool-stream')
-var through = require('through2')
 var async = require('async')
 var test = require('tape')
 
-test("Align reads to reference with BWA", function (t) {
+test('Align reads to reference with BWA', function (t) {
   t.plan(2)
   var referencePath = 'test/reference.fasta.gz'
   var readsPath = 'test/reads.fastq.gz'
@@ -23,50 +20,67 @@ test("Align reads to reference with BWA", function (t) {
   ]
   async.series(asyncFuncs)
 
-  function alignReadsToRef1(cb) {
-    var msg = "should take paths for reference, reads and aligment. Reference should be indexed first."
-    var mem = bwa() // default to mem
-    mem([referencePath, readsPath, alignmentPath])
-    .on('data', function(data) {
-      checksum(data, '3dae171586e8f5fda2737795ff2e39df711701cb', msg, t)
+  function alignReadsToRef1 (cb) {
+    var msg = 'should take paths for reference, reads and aligment. Reference should be indexed first.'
+    bwa(referencePath, readsPath, alignmentPath)
+    .on('data', function (data) {
+      if (data.operation !== 'mem'
+      || data.status !== 'finished') { return }
+      var hash = '745ad50cd1a4d5bb1941e4ee9e7da3266e23da94'
+      checksum(data, hash, msg, t)
       cb()
     })
+    .on('error', console.warn)
   }
-  function alignReadsToRef2(cb) {
-    var msg = "should align using a Stream that takes arrays of paths for reference and reads."
-    var mem = bwa('mem -x pacbio')
-    var memStream = mem() // we will pass arguments with write
-    memStream.write([referencePath, readsPath])
-    memStream.end()
-    memStream.on('data', function(data) {
-      checksum(data, 'a2ac465ac0d9e0879a9f9a43108e36b682f2e018', msg, t)
+  function alignReadsToRef2 (cb) {
+    var msg = 'should align using a Stream that takes arrays of paths for reference and reads.'
+    var options = {
+      operation: 'mem',
+      params: '-x pacbio'
+    }
+    var stream = bwa(options)
+    var obj = {
+      reference: referencePath,
+      reads: [readsPath]
+    }
+    stream.write(obj)
+    stream.end()
+    stream.on('data', function (data) {
+      if (data.operation !== 'mem'
+      || data.status !== 'finished') { return }
+      var hash = '13af2aae42f2ff062d6b0ebc6b42f4edd9f130e5'
+      checksum(data, hash, msg, t)
       cb()
     })
+    stream.on('error', console.warn)
   }
 })
 
-function download(url, path) {
-  return function task(callback) {
+function download (url, path) {
+  return function task (callback) {
     var read = request(url)
     var write = fs.createWriteStream(path)
-    read.pipe(write)
+    read.on('error', function (error) {
+      console.warn(error)
+    })
     write
     .on('finish', callback)
     .on('error', function (error) {
       console.warn(error)
     })
+    read.pipe(write)
   }
 }
 
-function checksum(data, hash, msg, t) {
-  if (['index', 'aln'].indexOf(data.operation) === -1 && data.status === 'finished') {
-    t.ok(fs.statSync(data.sam).size > 5500000, "check that it aligned something")
-    // var alignmentFile = fs.createReadStream(data.sam)
-    // var shasum = crypto.createHash('sha1')
-    // alignmentFile.on('data', function(d) { shasum.update(d) })
-    // alignmentFile.on('end', function() {
-    //   var sha1 = shasum.digest('hex');
-    //   t.equal(sha1, hash, msg)
-    // })
-  }
+function checksum (data, hash, msg, t) {
+  t.ok(fs.statSync(data.alignment).size > 5500000, 'check that it aligned something')
+  // The following doesn't work because the checksum of the aligment
+  // varies with machine it was created.
+  // var alignmentFile = fs.createReadStream(data.alignment)
+  // var shasum = crypto.createHash('sha1')
+  // alignmentFile.on('data', function(d) { shasum.update(d) })
+  // alignmentFile.on('end', function() {
+  //   var sha1 = shasum.digest('hex');
+  //   t.equal(sha1, hash, msg)
+  // })
 }
