@@ -9,7 +9,7 @@ test('Align reads to reference with BWA', function (t) {
   var referencePath = 'test/reference.fasta.gz'
   var readsPath = 'test/reads.fastq.gz'
   var alignmentPath = 'test/alignment.sam'
-  var referenceURL = 'http://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/protozoa/Guillardia_theta/Guith1/Primary_Assembly/unplaced_scaffolds/FASTA/unplaced.scaf.fa.gz'
+  var referenceURL = 'http://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/315/625/GCF_000315625.1_Guith1/GCF_000315625.1_Guith1_genomic.fna.gz'
   var readsURL = 'http://ftp.sra.ebi.ac.uk//vol1/fastq/SRR070/SRR070675/SRR070675.fastq.gz'
 
   var asyncFuncs = [
@@ -24,8 +24,7 @@ test('Align reads to reference with BWA', function (t) {
     var msg = 'should take paths for reference, reads and aligment. Reference should be indexed first.'
     bwa(referencePath, readsPath, alignmentPath)
     .on('data', function (data) {
-      if (data.operation !== 'mem'
-      || data.status !== 'finished') { return }
+      if (data.operation !== 'mem' || data.status !== 'finished') { return }
       var hash = '745ad50cd1a4d5bb1941e4ee9e7da3266e23da94'
       checksum(data, hash, msg, t)
       cb()
@@ -46,8 +45,7 @@ test('Align reads to reference with BWA', function (t) {
     stream.write(obj)
     stream.end()
     stream.on('data', function (data) {
-      if (data.operation !== 'mem'
-      || data.status !== 'finished') { return }
+      if (data.operation !== 'mem' || data.status !== 'finished') { return }
       var hash = '13af2aae42f2ff062d6b0ebc6b42f4edd9f130e5'
       checksum(data, hash, msg, t)
       cb()
